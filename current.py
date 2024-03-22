@@ -27,13 +27,13 @@ def main():
         
         break
 
-    with Image.open(chosen_image) as im: # open the image in read (rb) mode
-        image_pixel_width, image_pixel_height = im.size
-        print(f"Image size in pixels is {im.size}, image mode is {im.mode}")
-        im_array = np.asarray(im)
-        writable_im_array = im_array.copy() # to circumvent the editing disabled by default
-        im_axesimage = ax.imshow(im_array) # imshow displays the array
-        im_pixels_array = im.load()
+    with Image.open(chosen_image) as image: # open the image in read (rb) mode
+        image_pixel_width, image_pixel_height = image.size
+        print(f"Image size in pixels is {image.size}, image mode is {image.mode}")
+        uneditable_array = np.asarray(image)
+        axes_image = ax.imshow(uneditable_array) # imshow displays the array
+        pixels_array = image.load()
+        writable_array = uneditable_array.copy()
         
     def cos_similarity(vector1, vector2):
         cosine = np.dot(vector1,vector2)/(norm(vector1)*norm(vector2))
@@ -53,24 +53,22 @@ def main():
     def redden_pixel(x, y):
         global reddened_pixel_count
         print(f'Pixel {(x, y)} passed the check and is turning red')
-        writable_im_array[y, x] = [255, 0, 0]
+        writable_array[y, x] = [255, 0, 0]
         reddened_pixel_count += 1
 
     def pixel_picker(event):
         
-        if event.button is MouseButton.LEFT and isinstance(im_axesimage, AxesImage):
+        if event.button is MouseButton.LEFT and isinstance(axes_image, AxesImage):
             
             x = int(event.xdata)  
             y = int(event.ydata) 
-            pixel_values = im_pixels_array[x, y] 
+            pixel_values = pixels_array[x, y] 
             print(f"The pixel's RGB values are {pixel_values} and its position is {x, y}")
-            writable_im_array[y, x] = (255, 0, 0)
+            writable_array[y, x] = (255, 0, 0)
 
             def in_image(x, y):
                 if x + 1 <= image_pixel_width and x - 1 >= 0 and y + 1 <= image_pixel_height and y - 1 >= 0:
                     return True                        
-                else:
-                    return False
                         
             def check_pixel(x, y):
                 
@@ -78,12 +76,12 @@ def main():
                     print(f'Neighbor {(x, y)} is not in the image')
                     return
                     
-                if (x, y) not in checked_pixels:
-                    checked_pixels.append((x, y))
-                else:
+                if (x, y) in checked_pixels:
                     return
                 
-                if cos_similarity(im_pixels_array[x, y], pixel_values) < similarity_variable:
+                checked_pixels.append((x, y))
+                
+                if cos_similarity(pixels_array[x, y], pixel_values) < similarity_variable:
                     print(f'Neighbor {(x, y)} did not pass the similarity check')  
                     return
                 
@@ -109,10 +107,10 @@ def main():
             split_name = chosen_image.split('.')
             new_name = split_name[0] + ' modified' + '.' + split_name[1]
             
-            im = Image.fromarray(writable_im_array)
+            im = Image.fromarray(writable_array)
             im.save(new_name)
             im = Image.open(new_name)
-            ax.imshow(writable_im_array)
+            ax.imshow(writable_array)
             plt.show()
 
     plt.connect('button_press_event', pixel_picker)
