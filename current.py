@@ -14,13 +14,16 @@ checked_pixels = []
 pixel_queue = []
 reddened_pixel_count = 0
 
-chosen_image = str(input('Nazwa pliku: ')) 
+chosen_image = str(input('File name: ')) 
 
-similarity_variable = float(input('Współczynnik podobieństwa (od 0.1 do 1): '))
-
-while not similarity_variable >= 0.1 and not similarity_variable <= 1:
-    print('Współczynnik podobieństwa ma niepoprawną wartość, proszę spróbować ponownie')
-    similarity_variable = float(input('Współczynnik podobieństwa (od 0.1 do 1): '))
+while True:
+    similarity_variable = float(input('Similarity variable (0.1 to 1): '))
+    
+    while similarity_variable < 0.1 or similarity_variable > 1:
+        print('Similarity variable has an incorrect value, try again.')
+        similarity_variable = float(input('Similarity variable (0.1 to 1): '))
+    
+    break
 
 with Image.open(chosen_image) as im: # open the image in read (rb) mode
     image_pixel_width, image_pixel_height = im.size # najpierw pokazuje długość w osi x czyli kolumny, a potem w osi y czyli rzędy
@@ -71,25 +74,21 @@ def pixel_picker(event):
 
             def check_pixel(x, y):
                  
-                if in_image(x, y):
-                    print(f'Neighbor {(x, y)} with pixel values {writable_im_array[y, x]} will now go through reddening eligibility check')
-
-                    if (x, y) not in checked_pixels:
-                        checked_pixels.append((x, y))
-
-                        if cos_similarity(im_pixels_array[x, y], pixel_values) >= similarity_variable: 
-                            return True
-                         
-                        else:
-                            print(f'Neighbor {(x, y)} did not pass the similarity check') 
-                            return False
-                    else:
-                        checked_pixels.append((x, y)) 
-                        print(f'Neighbor {(x, y)} was already checked before') 
-                        return False
+                if not in_image(x, y):
+                    print(f'Neighbor {(x, y)} with pixel values {writable_im_array[y, x]} is not in the image.')
+                    return
+                    
+                if (x, y) not in checked_pixels:
+                    checked_pixels.append((x, y))
                 else:
-                    print(f'Neighbor {(x, y)} is not in the image')
-                    return False
+                    print(f'Neighbor {(x, y)} was already checked before')  
+                    return
+                
+                if cos_similarity(im_pixels_array[x, y], pixel_values) < similarity_variable:
+                    print(f'Neighbor {(x, y)} did not pass the similarity check')  
+                    return
+                
+                return True                     
 
             def queue_func(x, y):
                 
