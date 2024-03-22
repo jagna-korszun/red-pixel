@@ -26,10 +26,10 @@ while True:
     break
 
 with Image.open(chosen_image) as im: # open the image in read (rb) mode
-    image_pixel_width, image_pixel_height = im.size # najpierw pokazuje długość w osi x czyli kolumny, a potem w osi y czyli rzędy
+    image_pixel_width, image_pixel_height = im.size
     print(f"Image size in pixels is {im.size}, image mode is {im.mode}")
     im_array = np.asarray(im)
-    writable_im_array = im_array.copy() # kopia jest po, by obejść blokadę edycji
+    writable_im_array = im_array.copy() # to circumvent the editing disabled by default
     im_axesimage = ax.imshow(im_array) # wczytuje koordowy array i go pokazuje
     im_pixels_array = im.load()
     
@@ -47,12 +47,6 @@ def return_neighbors(x, y):
     left = [x-1, y]
     right = [x+1, y]
     return up, upright, upleft, down, downleft, downright, left, right
-
-def in_image(x, y):
-    if x + 1 <= image_pixel_width and x - 1 >= 0 and y + 1 <= image_pixel_height and y - 1 >= 0: # to nie jest praca na arrayu tylko na plocie, więc x,y powinno działać poprawnie
-        return True                        
-    else:
-        return False
     
 def redden_pixel(x, y):
     global reddened_pixel_count
@@ -72,16 +66,21 @@ def pixel_picker(event):
             # żeby było zgodne z tym, co pokazuje indeksator matplotliba
             writable_im_array[y, x] = (255, 0, 0)
 
+            def in_image(x, y):
+                if x + 1 <= image_pixel_width and x - 1 >= 0 and y + 1 <= image_pixel_height and y - 1 >= 0: # to nie jest praca na arrayu tylko na plocie, więc x,y powinno działać poprawnie
+                    return True                        
+                else:
+                    return False
+                        
             def check_pixel(x, y):
                  
                 if not in_image(x, y):
-                    print(f'Neighbor {(x, y)} with pixel values {writable_im_array[y, x]} is not in the image.')
+                    print(f'Neighbor {(x, y)} is not in the image.')
                     return
                     
                 if (x, y) not in checked_pixels:
                     checked_pixels.append((x, y))
                 else:
-                    print(f'Neighbor {(x, y)} was already checked before')  
                     return
                 
                 if cos_similarity(im_pixels_array[x, y], pixel_values) < similarity_variable:
