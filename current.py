@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseButton
 from PIL import Image
 from numpy.linalg import norm
 
-def main():
+def main() -> None:
     fig, ax = plt.subplots()
     fig.subplots_adjust(0,0,1,1)
 
@@ -56,7 +56,7 @@ def main():
         writable_array[y, x] = [255, 0, 0]
         reddened_pixel_count += 1
 
-    def pixel_picker(event):
+    def pixel_picker(event) -> None:
         
         if event.button is MouseButton.LEFT and isinstance(axes_image, AxesImage):
             
