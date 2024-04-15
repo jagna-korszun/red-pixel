@@ -35,11 +35,11 @@ def main():
         pixels_array = image.load()
         writable_array = uneditable_array.copy()
         
-    def cos_similarity(vector1, vector2):
+    def cos_similarity(vector1, vector2) -> float:
         cosine = np.dot(vector1,vector2)/(norm(vector1)*norm(vector2))
         return cosine
 
-    def return_neighbors(x, y): 
+    def return_neighbors(x, y) -> list[str]: 
         up = [x, y+1]
         upleft = [x-1, y+1]
         upright = [x+1, y+1]
@@ -50,7 +50,7 @@ def main():
         right = [x+1, y]
         return up, upright, upleft, down, downleft, downright, left, right
         
-    def redden_pixel(x, y):
+    def redden_pixel(x, y) -> None:
         global reddened_pixel_count
         print(f'Pixel {(x, y)} passed the check and is turning red')
         writable_array[y, x] = [255, 0, 0]
