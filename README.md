@@ -1,0 +1,1 @@
+A small program created as an exercise. You click a pixel, it turns red, pixels adjacent to it undergo a test based on the similarity variable (between 0 and 1), after which they either stay the same or turn red. A pixel turning red causes another batch of pixels to undergo the testing, the program finishes once no pixels fulfilling the requirements are left.
