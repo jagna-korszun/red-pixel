@@ -40,14 +40,14 @@ def main() -> None:
         return cosine
 
     def return_neighbors(x, y) -> list[str]: 
-        up = [x, y+1]
-        upleft = [x-1, y+1]
-        upright = [x+1, y+1]
-        down = [x, y-1]
-        downleft = [x-1, y-1]
-        downright = [x+1, y-1]
-        left = [x-1, y]
-        right = [x+1, y]
+        up = (x, y+1)
+        upleft = (x-1, y+1)
+        upright = (x+1, y+1)
+        down = (x, y-1)
+        downleft = (x-1, y-1)
+        downright = (x+1, y-1)
+        left = (x-1, y)
+        right = (x+1, y)
         return up, upright, upleft, down, downleft, downright, left, right
         
     def redden_pixel(x, y) -> None:
