@@ -26,19 +26,19 @@ def main() -> None:
 
         break
 
-    with Image.open(chosen_image) as image: # open the image in read (rb) mode
+    with Image.open(chosen_image) as image: # Opens the image in read (rb) mode.
         image_pixel_width, image_pixel_height = image.size
         print(f"Image size in pixels is {image.size}, image mode is {image.mode}")
-        uneditable_array = np.asarray(image)
-        writable_array = uneditable_array.copy()
-        axes_image = ax.imshow(uneditable_array) # imshow displays the array
-        pixels_array = image.load()
+        uneditable_array = np.asarray(image) # Creates an array holding the pixels' RGB values from the image.
+        writable_array = uneditable_array.copy() # Copies the array above to circumvent the unwritable array issue in numpy.
+        axes_image = ax.imshow(uneditable_array) # Creates a clickable data representation.
+        pixels_array = image.load() # Creates an array holding the pixels' RGB values from the image but in a vector-friendly format.
 
     def cos_similarity(vector1, vector2) -> float:
         cosine = np.dot(vector1,vector2)/(norm(vector1)*norm(vector2))
         return cosine
 
-    def return_neighbors(x, y) -> list[str]: 
+    def return_neighbors(x, y) -> list[str]:
         up = (x, y+1)
         upleft = (x-1, y+1)
         upright = (x+1, y+1)
@@ -55,6 +55,10 @@ def main() -> None:
         writable_array[y, x] = [255, 0, 0]
         reddened_pixel_count += 1
 
+    def in_image(x, y) -> bool:
+        if x + 1 <= image_pixel_width and x - 1 >= 0 and y + 1 <= image_pixel_height and y - 1 >= 0:
+            return True
+
     def pixel_picker(event) -> None:
 
         if event.button is MouseButton.LEFT and isinstance(axes_image, AxesImage):
@@ -63,12 +67,7 @@ def main() -> None:
             y = int(event.ydata) 
             pixel_values = pixels_array[x, y] 
             print(f"The pixel's RGB values are {pixel_values} and its position is {x, y}")
-            print (writable_array[y, x])
             writable_array[y, x] = [255, 0, 0]
-
-            def in_image(x, y):
-                if x + 1 <= image_pixel_width and x - 1 >= 0 and y + 1 <= image_pixel_height and y - 1 >= 0:
-                    return True
 
             def check_pixel(x, y):
 
@@ -103,6 +102,8 @@ def main() -> None:
                 a = pixel_queue[0]
                 del pixel_queue[0]
                 queue_func(a[0], a[1])
+
+            print(f"{reddened_pixel_count} pixels have turned red.")
 
             split_name = chosen_image.split('.')
             new_name = split_name[0] + ' modified' + '.' + split_name[1]
