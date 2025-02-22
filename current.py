@@ -15,7 +15,7 @@ def main() -> None:
     pixel_queue = []
     reddened_pixel_count = 0
 
-    chosen_image = str(input('File name: ')) 
+    chosen_image = str(input('File name: '))
 
     while True:
         similarity_variable = float(input('Enter similarity variable (0.1 to 1): '))
@@ -110,7 +110,7 @@ def main() -> None:
 
             im = Image.fromarray(writable_array)
             im.save(new_name)
-            im = Image.open(new_name)
+
             ax.imshow(writable_array)
             plt.show()
 
